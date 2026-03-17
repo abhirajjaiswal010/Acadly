@@ -14,6 +14,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Class = require('../models/Class');
+const Poll = require('../models/Poll');
 
 // Map: roomId -> Set of connected socket IDs
 const rooms = new Map();
@@ -284,6 +285,102 @@ const initializeSocket = (io) => {
         userName: socket.userName,
         isRaised,
       });
+    });
+
+    // ─────────────────────────────────────────
+    // POLL EVENTS
+    // ─────────────────────────────────────────
+
+    // Create a new poll (Teacher only)
+    socket.on('create-poll', async ({ roomId, question, options, duration, anonymous }) => {
+      if (socket.userRole !== 'teacher') {
+        return socket.emit('error', { message: 'Only teachers can create polls' });
+      }
+
+      try {
+        const poll = new Poll({
+          roomId,
+          creatorId: socket.userId,
+          question,
+          options: options.map(opt => ({ text: opt, votes: 0 })),
+          duration: duration || 30,
+          anonymous: anonymous || false,
+          active: true,
+          expiresAt: new Date(Date.now() + (duration || 30) * 1000),
+        });
+
+        await poll.save();
+
+        // Broadcast to everyone in the room
+        io.to(roomId).emit('new-poll', poll);
+
+        // Auto-close poll after duration
+        setTimeout(async () => {
+          const updatedPoll = await Poll.findByIdAndUpdate(poll._id, { active: false }, { new: true });
+          if (updatedPoll) {
+            io.to(roomId).emit('poll-ended', updatedPoll);
+          }
+        }, (duration || 30) * 1000);
+
+      } catch (err) {
+        console.error('create-poll error:', err);
+        socket.emit('error', { message: 'Failed to create poll' });
+      }
+    });
+
+    // Cast a vote
+    socket.on('cast-vote', async ({ pollId, optionIndex }) => {
+      try {
+        const poll = await Poll.findById(pollId);
+        if (!poll || !poll.active) {
+          return socket.emit('error', { message: 'Poll is no longer active' });
+        }
+
+        // Check if already voted
+        const hasVoted = poll.voters.some(v => v.userId === socket.userId);
+        if (hasVoted) {
+          return socket.emit('error', { message: 'You have already voted' });
+        }
+
+        // Update votes and voters
+        poll.options[optionIndex].votes += 1;
+        poll.voters.push({ userId: socket.userId, optionIndex });
+        await poll.save();
+
+        // Broadcast updated poll to everyone in the room
+        io.to(poll.roomId).emit('poll-update', poll);
+
+      } catch (err) {
+        console.error('cast-vote error:', err);
+        socket.emit('error', { message: 'Failed to cast vote' });
+      }
+    });
+
+    // End poll manually (Teacher only)
+    socket.on('end-poll', async ({ pollId }) => {
+      if (socket.userRole !== 'teacher') {
+        return socket.emit('error', { message: 'Only teachers can end polls' });
+      }
+
+      try {
+        const poll = await Poll.findByIdAndUpdate(pollId, { active: false }, { new: true });
+        if (poll) {
+          io.to(poll.roomId).emit('poll-ended', poll);
+        }
+      } catch (err) {
+        console.error('end-poll error:', err);
+        socket.emit('error', { message: 'Failed to end poll' });
+      }
+    });
+
+    // Get active polls for the room (for late joiners)
+    socket.on('get-active-polls', async ({ roomId }) => {
+      try {
+        const polls = await Poll.find({ roomId, active: true });
+        socket.emit('active-polls', polls);
+      } catch (err) {
+        console.error('get-active-polls error:', err);
+      }
     });
 
     // ─────────────────────────────────────────

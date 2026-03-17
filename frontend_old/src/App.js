@@ -8,6 +8,7 @@ import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Pages
+import LandingPage from './pages/LandingPage';          // ← ADD THIS
 import { LoginPage, RegisterPage } from './pages/AuthPages';
 import Dashboard from './pages/Dashboard';
 import ClassForm from './pages/ClassForm';
@@ -19,7 +20,7 @@ const App = () => {
   return (
     <Router>
       <div className="app-layout">
-        <Toaster 
+        <Toaster
           position="top-right"
           toastOptions={{
             style: {
@@ -29,54 +30,65 @@ const App = () => {
             },
           }}
         />
-        
+
         {isAuthenticated && <Navbar />}
 
         <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/dashboard" />} />
-          <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/dashboard" />} />
+          {/* ── Landing Page (public) ── */}
+          <Route
+            path="/"
+            element={isAuthenticated ? <Navigate to="/dashboard" /> : <LandingPage />}
+          />
 
-          {/* Protected Routes */}
-          <Route 
-            path="/dashboard" 
+          {/* ── Auth Routes (public) ── */}
+          <Route
+            path="/login"
+            element={!isAuthenticated ? <LoginPage /> : <Navigate to="/dashboard" />}
+          />
+          <Route
+            path="/register"
+            element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/dashboard" />}
+          />
+
+          {/* ── Protected Routes ── */}
+          <Route
+            path="/dashboard"
             element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
-            } 
+            }
           />
 
-          <Route 
-            path="/classes/create" 
+          <Route
+            path="/classes/create"
             element={
               <ProtectedRoute allowedRoles={['teacher', 'admin']}>
                 <ClassForm />
               </ProtectedRoute>
-            } 
+            }
           />
 
-          <Route 
-            path="/classes/edit/:id" 
+          <Route
+            path="/classes/edit/:id"
             element={
               <ProtectedRoute allowedRoles={['teacher', 'admin']}>
                 <ClassForm />
               </ProtectedRoute>
-            } 
+            }
           />
 
-          <Route 
-            path="/classroom/:sessionId" 
+          <Route
+            path="/classroom/:sessionId"
             element={
               <ProtectedRoute>
                 <ClassRoom />
               </ProtectedRoute>
-            } 
+            }
           />
 
-          {/* Fallback */}
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-          <Route path="*" element={<Navigate to="/dashboard" />} />
+          {/* ── Fallback ── */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
     </Router>

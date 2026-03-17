@@ -145,7 +145,7 @@ const ChatBox = ({ socket, roomId }) => {
                 key={msg.id}
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                className={`flex flex-col gap-1 ${isOwn ? 'items-end' : 'items-start'}`}
+                className={`flex flex-col gap-1.5 ${isOwn ? 'items-end' : 'items-start'}`}
               >
                 <div className="flex items-center gap-2 mb-0.5">
                   <span className="text-[10px] font-bold text-muted px-1">
@@ -160,10 +160,10 @@ const ChatBox = ({ socket, roomId }) => {
                 </div>
                 
                 <div className="group relative max-w-[85%]">
-                  <div className={`chat-bubble p-3 rounded-2xl shadow-sm border ${
+                  <div className={`chat-bubble border ${
                     isOwn 
-                      ? 'bg-primary text-white border-primary rounded-tr-none' 
-                      : 'bg-card-hover text-white border-border rounded-tl-none'
+                      ? 'own' 
+                      : 'bg-card-hover text-white border-border'
                   }`}>
                     <p className="text-sm leading-relaxed break-words">{msg.message}</p>
                   </div>
@@ -172,7 +172,7 @@ const ChatBox = ({ socket, roomId }) => {
                   </div>
                   
                   {/* Hover Reactions Placeholder */}
-                  <div className={`absolute top-0 ${isOwn ? 'right-full mr-2' : 'left-full ml-2'} opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 p-1 bg-surface border border-border rounded-full shadow-lg z-10`}>
+                  <div className={`absolute top-0 ${isOwn ? 'right-full mr-2' : 'left-full ml-2'} opacity-0 group-hover:opacity-100 transition-all flex gap-1 p-1 bg-surface border border-border rounded-full shadow-lg z-10`}>
                     {['👍', '❤️', '🔥'].map(e => (
                       <span key={e} className="cursor-pointer hover:scale-125 transition-transform text-xs p-1">{e}</span>
                     ))}
@@ -205,16 +205,17 @@ const ChatBox = ({ socket, roomId }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 3. Sticky Input Area */}
-      <div className="p-4 bg-surface border-t border-border mt-auto">
-        <form onSubmit={sendMessage} className="relative flex items-center gap-2">
+      {/* 3. Premium Sticky Input Area */}
+      <div className="chat-input-wrapper">
+        <form onSubmit={sendMessage} className="relative flex items-center gap-3">
           <div className="flex-1 relative flex items-center">
-            <button type="button" className="absolute left-3 text-muted hover:text-primary transition-colors">
-              <Smile size={18} />
-            </button>
+            {/* <button type="button" className="chat-icon-btn left">
+              <Smile size={20} />
+            </button> */}
+            
             <textarea
               ref={inputRef}
-              className="w-full bg-card-hover border border-border rounded-2xl py-3 px-10 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none overflow-hidden h-[46px] leading-[22px] text-white"
+              className="w-full chat-input-field focus:outline-none resize-none overflow-hidden"
               placeholder="Start typing..."
               value={inputText}
               onChange={handleInputChange}
@@ -222,20 +223,18 @@ const ChatBox = ({ socket, roomId }) => {
               maxLength={500}
               rows={1}
             />
-            <button type="button" className="absolute right-3 text-muted hover:text-primary transition-colors">
-              <Paperclip size={18} />
-            </button>
+            
+            {/* <button type="button" className="chat-icon-btn right">
+              <Paperclip size={20} />
+            </button> */}
           </div>
+          
           <button
             type="submit"
-            className={`w-11 h-11 flex items-center justify-center rounded-xl transition-all shadow-lg ${
-              inputText.trim() 
-                ? 'bg-primary text-white hover:bg-primary-dark scale-100 hover:scale-105 active:scale-95' 
-                : 'bg-muted/10 text-muted scale-95 opacity-50 cursor-not-allowed'
-            }`}
+            className="chat-send-button"
             disabled={!inputText.trim()}
           >
-            <SendHorizontal size={20} />
+            <SendHorizontal size={22} />
           </button>
         </form>
       </div>

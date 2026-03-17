@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
 // ── tiny inline CSS injected once ──────────────────────────────
 const globalStyles = `
@@ -247,14 +248,14 @@ function Navbar() {
       style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50 }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px", height: 66, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         {/* Logo */}
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+        <Link to="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
           <div style={{ width: 36, height: 36, borderRadius: 11, background: "linear-gradient(135deg,#4f46e5,#6d28d9)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.2} strokeLinecap="round">
               <path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" />
             </svg>
           </div>
           <span style={{ fontSize: 19, fontWeight: 800, color: "#1e1b4b", letterSpacing: "-0.025em" }}>ACADLY</span>
-        </a>
+        </Link>
 
         {/* Desktop links */}
         <div style={{ display: "flex", gap: 30 }} className="nav-links">
@@ -270,8 +271,8 @@ function Navbar() {
 
         {/* CTA */}
         <div style={{ display: "flex", gap: 10 }} className="nav-ctas">
-          <a href="/login" className="btn-outline" style={{ padding: "8px 20px", borderRadius: 12, fontSize: 14, fontWeight: 600, textDecoration: "none", fontFamily: "inherit" }}>Sign In</a>
-          <a href="/register" className="btn-solid" style={{ padding: "8px 20px", borderRadius: 12, fontSize: 14, fontWeight: 600, textDecoration: "none", fontFamily: "inherit" }}>Get Started</a>
+          <Link to="/login" className="btn-outline" style={{ padding: "8px 20px", borderRadius: 12, fontSize: 14, fontWeight: 600, textDecoration: "none", fontFamily: "inherit" }}>Sign In</Link>
+          <Link to="/register" className="btn-solid" style={{ padding: "8px 20px", borderRadius: 12, fontSize: 14, fontWeight: 600, textDecoration: "none", fontFamily: "inherit" }}>Get Started</Link>
         </div>
 
         {/* Hamburger */}
@@ -297,8 +298,8 @@ function Navbar() {
             </button>
           ))}
           <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
-            <a href="/login" className="btn-outline" style={{ flex: 1, padding: "10px 0", borderRadius: 12, fontSize: 14, fontWeight: 600, textAlign: "center", textDecoration: "none", fontFamily: "inherit" }}>Sign In</a>
-            <a href="/register" className="btn-solid" style={{ flex: 1, padding: "10px 0", borderRadius: 12, fontSize: 14, fontWeight: 600, textAlign: "center", textDecoration: "none", fontFamily: "inherit" }}>Get Started</a>
+            <Link to="/login" className="btn-outline" style={{ flex: 1, padding: "10px 0", borderRadius: 12, fontSize: 14, fontWeight: 600, textAlign: "center", textDecoration: "none", fontFamily: "inherit" }}>Sign In</Link>
+            <Link to="/register" className="btn-solid" style={{ flex: 1, padding: "10px 0", borderRadius: 12, fontSize: 14, fontWeight: 600, textAlign: "center", textDecoration: "none", fontFamily: "inherit" }}>Get Started</Link>
           </div>
         </div>
       )}
@@ -461,16 +462,16 @@ function Hero() {
             </p>
 
             <div className="hu4" style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 36 }}>
-              <a href="/register?role=teacher" className="btn-solid"
+              <Link to="/register?role=teacher" className="btn-solid"
                 style={{ padding: "12px 26px", borderRadius: 13, fontSize: 15, fontWeight: 700, textDecoration: "none", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 8 }}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 15V9l7 3.5z" /></svg>
                 Start Teaching Free
-              </a>
-              <a href="/register?role=student" className="btn-outline"
+              </Link>
+              <Link to="/register?role=student" className="btn-outline"
                 style={{ padding: "12px 26px", borderRadius: 13, fontSize: 15, fontWeight: 700, textDecoration: "none", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 8 }}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" /></svg>
                 Join as Student
-              </a>
+              </Link>
             </div>
 
             {/* Social proof */}
@@ -622,11 +623,11 @@ function Roles() {
                 </div>
               ))}
             </div>
-            <a href="/register?role=teacher" className="btn-solid"
+            <Link to="/register?role=teacher" className="btn-solid"
               style={{ marginTop: 28, padding: "11px 24px", borderRadius: 13, fontSize: 14, fontWeight: 700, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 7, fontFamily: "inherit" }}>
               Register as Teacher
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-            </a>
+            </Link>
           </div>
 
           {/* Student */}
@@ -648,13 +649,13 @@ function Roles() {
                 </div>
               ))}
             </div>
-            <a href="/register?role=student"
+            <Link to="/register?role=student"
               style={{ marginTop: 28, padding: "11px 24px", borderRadius: 13, fontSize: 14, fontWeight: 700, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 7, fontFamily: "inherit", background: "rgba(79,70,229,.07)", color: "#4f46e5", border: "1.5px solid #c7d2fe", transition: "background .2s" }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(79,70,229,.13)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(79,70,229,.07)"}>
               Register as Student
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -773,16 +774,16 @@ function CTABanner() {
           Create your first classroom in under 60 seconds. Or join as a student with a session code.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <a href="/register?role=teacher" className="btn-white"
+          <Link to="/register?role=teacher" className="btn-white"
             style={{ padding: "12px 28px", borderRadius: 13, fontSize: 15, fontWeight: 700, textDecoration: "none", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 8 }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 15V9l7 3.5z" /></svg>
             Start as Teacher
-          </a>
-          <a href="/register?role=student" className="btn-ghost-inv"
+          </Link>
+          <Link to="/register?role=student" className="btn-ghost-inv"
             style={{ padding: "12px 28px", borderRadius: 13, fontSize: 15, fontWeight: 700, textDecoration: "none", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 8 }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" /></svg>
             Join as Student
-          </a>
+          </Link>
         </div>
         <p style={{ color: "rgba(255,255,255,.35)", fontSize: 12, marginTop: 18 }}>No credit card required · Free plan available</p>
       </div>
@@ -814,7 +815,11 @@ function Footer() {
             <div key={c.heading}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "#0f172a", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 16 }}>{c.heading}</div>
               {c.links.map(([label, href]) => (
-                <a key={label} href={href} className="footer-link">{label}</a>
+                href.startsWith('#') ? (
+                  <a key={label} href={href} className="footer-link">{label}</a>
+                ) : (
+                  <Link key={label} to={href} className="footer-link">{label}</Link>
+                )
               ))}
             </div>
           ))}

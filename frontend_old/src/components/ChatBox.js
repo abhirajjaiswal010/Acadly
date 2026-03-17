@@ -172,11 +172,11 @@ const ChatBox = ({ socket, roomId }) => {
                   </div>
                   
                   {/* Hover Reactions Placeholder */}
-                  <div className={`absolute top-0 ${isOwn ? 'right-full mr-2' : 'left-full ml-2'} opacity-0 group-hover:opacity-100 transition-all flex gap-1 p-1 bg-surface border border-border rounded-full shadow-lg z-10`}>
+                  {/* <div className={`absolute top-0 ${isOwn ? 'right-full mr-2' : 'left-full ml-2'} opacity-0 group-hover:opacity-100 transition-all flex gap-1 p-1 bg-surface border border-border rounded-full shadow-lg z-10`}>
                     {['👍', '❤️', '🔥'].map(e => (
                       <span key={e} className="cursor-pointer hover:scale-125 transition-transform text-xs p-1">{e}</span>
                     ))}
-                  </div>
+                  </div> */}
                 </div>
               </motion.div>
             );

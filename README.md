@@ -1,110 +1,90 @@
-# 🎓 LearnLive: Real-Time Video Collaboration Platform
+# 🎓 Acadly: Real-Time Live Class Platform
 
-A high-performance remote learning platform built with the MERN stack, WebRTC, and Socket.io. It supports real-time video/audio streaming, screen sharing, and interactive classrooms.
-
-> [!NOTE]
-> Detailed development notes and fixes for common stack errors can be found in [TROUBLESHOOTING.md](./TROUBLESHOOTING.md).
-
-## 🚀 Key Features
-
-- **Authentication**: JWT-based auth with Role-Based Access Control (Student/Teacher/Admin).
-- **Classroom Management**: Teachers can create/manage classes with unique session codes.
-- **WebRTC Streaming**: Peer-to-peer video/audio with low latency.
-- **Screen Sharing**: High-resolution screen sharing for teachers and students.
-- **Real-Time Signaling**: Handled via Socket.io for offer/answer/ICE exchange.
-- **Interactive Chat**: Built-in chat system for every classroom.
-- **Reactions**: Send live emojis to keep sessions engaging.
-- **Modern UI**: Dark-themed, glassmorphic design using Vanilla CSS.
+Acadly is a modern MERN-stack application designed for seamless real-time learning. It leverages WebRTC for high-quality video/audio streaming, Socket.io for instant signaling and interactivity, and MongoDB for persistent data.
 
 ---
 
-## 🛠️ Technology Stack
+## 🚀 API Documentation
 
-- **Frontend**: React (Hooks), Redux Toolkit, Socket.io-client, Axios, Lucide-icons.
-- **Backend**: Node.js, Express, Socket.io, Mongoose (MongoDB).
-- **RTC**: Native WebRTC API via `simple-peer` logic.
-- **Styling**: Vanilla CSS with Design Tokens.
+Base URL: `http://localhost:5000/api`
 
----
+### 🔒 Authentication (`/api/auth`)
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| POST | `/register` | Register a new user (Teacher/Student) | Public |
+| POST | `/login` | Authenticate and get JWT token | Public |
+| GET | `/me` | Get current user profile | Protected |
+| PUT | `/profile` | Update user profile details | Protected |
+| PUT | `/change-password` | Update account password | Protected |
+| GET | `/users` | Get list of all users | Admin |
 
-## 📦 Project Structure
+### 📚 Classes (`/api/classes`)
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| GET | `/` | List all classes for current user | Protected |
+| POST | `/` | Create a new class session | Teacher/Admin |
+| GET | `/:id` | Get class details by ID | Protected |
+| PUT | `/:id` | Update class details | Teacher/Admin |
+| DELETE | `/:id` | Remove a class session | Teacher/Admin |
+| POST | `/join` | Join a class using Session Code | Student/Admin |
+| GET | `/session/:sessionId` | Find class using 8-digit code | Protected |
+| GET | `/admin/all` | List every class in the system | Admin |
 
-```text
-backend/
-├── config/         # DB connection
-├── controllers/    # API logic (Auth, Class)
-├── middleware/     # Auth & Error handlers
-├── models/         # Mongoose Schemas
-├── routes/         # Express routes
-├── socket/         # Signaling Server logic
-└── server.js       # Entry point
-
-frontend/
-├── src/
-│   ├── components/ # Reusable UI (Video, Chat, Navbar)
-│   ├── hooks/      # useWebRTC core logic
-│   ├── pages/      # Main views (Dashboard, ClassRoom)
-│   ├── redux/      # Global state management
-│   └── utils/      # API & Socket singletons
-└── .env            # Frontend environment variables
-```
-
----
-
-## ⚙️ Setup Instructions
-
-### 1. Prerequisites
-- Node.js (v16+)
-- MongoDB (Running locally on `27017` or Atlas URI)
-
-### 2. Backend Setup
-1. Navigate to the backend folder:
-   ```bash
-   cd backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Configure `.env`:
-   - Fill in your `MONGO_URI` and `JWT_SECRET`.
-4. Start the server:
-   ```bash
-   npm run dev
-   ```
-
-### 3. Frontend Setup
-1. Navigate to the frontend folder:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the React app:
-   ```bash
-   npm start
-   ```
+### 🖍️ Whiteboard (`/api/whiteboard`)
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| GET | `/:roomId` | Retrieve saved whiteboard data | Protected |
+| POST | `/save` | Save current whiteboard state | Protected |
 
 ---
 
-## 📖 How to Use
+## ⚡ Socket.io Events
 
-1. **Register as a Teacher**: Create a new account and select the "Teacher" role.
-2. **Create a Class**: From the dashboard, click "Create Class". A unique 8-digit **Session Code** will be generated.
-3. **Go Live**: Ener the classroom and enable your camera/mic.
-4. **Student Join**: Register as a "Student", enter the session code on your dashboard, and click "Join".
-5. **Interactive Tools**: Use the chat panel on the right or the reaction picker in the center console.
+The socket server facilitates WebRTC signaling and real-time interactive features. All events require a valid JWT token in the handshake.
+
+### Client-to-Server (Emit)
+- **`join-room`**: `{ roomId }` - Join a specific classroom session.
+- **`webrtc-offer`**: `{ targetSocketId, sdp }` - Initiate a WebRTC connection.
+- **`webrtc-answer`**: `{ targetSocketId, sdp }` - Respond to an offer.
+- **`ice-candidate`**: `{ targetSocketId, candidate }` - Exchange network path.
+- **`chat-message`**: `{ roomId, message }` - Send message to classroom.
+- **`typing`**: `{ roomId, isTyping }` - Broadcast typing status.
+- **`send-reaction`**: `{ roomId, emoji }` - Send instant emoji reaction.
+- **`raise-hand`**: `{ roomId, isRaised }` - Notify teacher of a doubt.
+- **`draw`**: `{ roomId, ...drawData }` - Real-time whiteboard sync.
+- **`clear-whiteboard`**: `{ roomId }` - Reset drawing board for all.
+- **`media-state-change`**: `{ roomId, isAudioEnabled, isVideoEnabled }` - Update stream status.
+- **`screen-share-start`**: `{ roomId }` - Notify others of incoming screen share.
+
+### Server-to-Client (Listen)
+- **`room-participants`**: Received upon joining; lists all current users.
+- **`user-joined`**: Notifies others when a new student/teacher joins.
+- **`chat-message`**: Incoming real-time message payload.
+- **`reaction-received`**: Floating emoji notification.
+- **`hand-raised`**: Visual indicator in participant list.
+- **`participant-media-change`**: Syncs mute/unmute status icons.
+- **`teacher-left`**: Special alert when the host disconnects.
+- **`error`**: Handles room not found or auth failures.
 
 ---
 
-## 🔒 Security & Optimization
+## 🛠️ Setup Instructions
 
-- **JWT Security**: All sensitive routes are protected by JWT verification.
-- **ICE/TURN**: Configured with Google STUN servers. For production, add a TURN server (e.g., Metered or Twilio) in `useWebRTC.js`.
-- **Performance**: Track replacement for screen sharing avoids renegotiation where possible.
+### Backend
+1. `cd backend`
+2. `npm install`
+3. Create `.env` file with `MONGO_URI`, `JWT_SECRET`, and `PORT`.
+4. `npm run dev` (Runs on port 5000 by default)
+
+### Frontend
+1. `cd frontend_old`
+2. `bun install` (or `npm install`)
+3. `bun run dev` (Runs on port 3000)
 
 ---
 
-Created with ❤️ by Antigravity AI
+## 🏗️ Architecture
+- **Signaling**: Custom Node.js/Socket.io signaling logic for WebRTC handshakes.
+- **P2P Streaming**: `simple-peer` for direct browser-to-browser media streams.
+- **State**: Redux Toolkit for auth and class state management.
+- **UI**: Modern React with Glassmorphism styling and `framer-motion` animations.

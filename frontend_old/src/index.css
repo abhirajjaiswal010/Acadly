@@ -1616,3 +1616,172 @@ img { max-width: 100%; }
   0%, 100% { transform: translateY(0); opacity: 0.5; }
   50% { transform: translateY(-4px); opacity: 1; }
 }
+
+/* ═══════════════════════════════════════════════════════
+   Whiteboard System
+   Premium Collaborative Canvas
+══════════════════════════════════════════════════════════ */
+.whiteboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: #ffffff; /* Typically whiteboard is white even in dark mode */
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.canvas-wrapper {
+  flex: 1;
+  position: relative;
+  background: white;
+  cursor: default;
+}
+
+.whiteboard-canvas.pen-cursor {
+  cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTE3IDNoMi44MjggMi44MjggMCAxIDEgNCA0TDcuNSAyMC41IDIgMjJsMS41LTUuNUwxNyAzeiI+PC9wYXRoPjwvc3ZnPg==") 0 24, crosshair;
+}
+
+.whiteboard-canvas.eraser-cursor {
+  cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTIwIDIwSDdMMyAxNkMyLjUgMTUuNSAyLjUgMTQuNSAzIDE0TDEzIDRDMTMuNSAzLjUgMTQuNSAzLjUgMTUgNEwyMSAxMEMyMS41IDEwLjUgMjEuNSAxMS41IDIxIDEyTDE3IDE2TDIwIDIwWiI+PC9wYXRoPjxsaW5lIHgxPSIxNyIgeTE9IjE2IiB4Mj0iNyIgeTI9IjE2Ij48L2xpbmU+PC9zdmc+") 0 24, cell;
+}
+
+.whiteboard-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.whiteboard-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+  flex-wrap: wrap;
+}
+
+[data-theme='dark'] .whiteboard-toolbar {
+  background: var(--bg-surface);
+}
+
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toolbar-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.toolbar-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+
+.toolbar-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.colors-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+}
+
+.color-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.color-dot:hover {
+  transform: scale(1.2);
+}
+
+.color-dot.active {
+  box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--primary);
+}
+
+.divider-v {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+}
+
+.whiteboard-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Integration with ClassRoom Layout */
+.video-area-inner {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+.video-grid-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.with-whiteboard .video-grid {
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+  padding: 1rem !important;
+}
+
+.whiteboard-panel-wrap {
+  width: 60%;
+  height: 100%;
+  padding: 1.5rem 1.5rem 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.whiteboard-active .video-area-inner.with-whiteboard .video-grid {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+}
+
+/* Adjustments for integrated view */
+@media (max-width: 1200px) {
+  .video-area-inner.with-whiteboard {
+    flex-direction: column;
+  }
+  .whiteboard-panel-wrap {
+    width: 100%;
+    height: 50%;
+    padding: 0 1.5rem 1.5rem 1.5rem;
+  }
+}

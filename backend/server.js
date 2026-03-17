@@ -11,6 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const classRoutes = require('./routes/classRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
 const initializeSocket = require('./socket/socketHandler');
+const whiteboardRoutes = require('./routes/whiteboardRoutes');
 
 // ────────────────────────────────────────────────────────
 // Initialize Express App
@@ -74,6 +75,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
+app.use('/api/whiteboard', whiteboardRoutes);
 
 // 404 Handler
 app.use((req, res) => {

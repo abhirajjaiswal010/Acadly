@@ -287,6 +287,22 @@ const initializeSocket = (io) => {
     });
 
     // ─────────────────────────────────────────
+    // WHITEBOARD EVENTS
+    // ─────────────────────────────────────────
+    socket.on('draw', (data) => {
+      // data should contain roomId
+      if (data.roomId) {
+        socket.to(data.roomId).emit('draw', data);
+      }
+    });
+
+    socket.on('clear-whiteboard', ({ roomId }) => {
+      if (roomId) {
+        io.to(roomId).emit('clear-whiteboard');
+      }
+    });
+
+    // ─────────────────────────────────────────
     // GET ROOM PARTICIPANTS (re-request)
     // ─────────────────────────────────────────
     socket.on('get-participants', ({ roomId }) => {

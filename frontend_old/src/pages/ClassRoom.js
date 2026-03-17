@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchClassBySession, clearCurrentClass } from '../redux/slices/classSlice';
@@ -6,11 +6,13 @@ import useWebRTC from '../hooks/useWebRTC';
 import { initSocket, disconnectSocket } from '../utils/socket';
 import VideoPlayer from '../components/VideoPlayer';
 import ChatBox from '../components/ChatBox';
+import Whiteboard from '../components/whiteboard/Whiteboard';
 import toast from 'react-hot-toast';
 import { 
   Mic, MicOff, Video as VideoIcon, VideoOff, ScreenShare, 
   Smile, Hand, PhoneOff, MessageSquare, Users, 
-  LogOut, GraduationCap, Users2, ShieldCheck, MonitorOff
+  GraduationCap, Users2, ShieldCheck, MonitorOff,
+  Presentation
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -26,6 +28,7 @@ const ClassRoom = () => {
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'participants'
   const [showReactions, setShowReactions] = useState(false);
   const [reactions, setReactions] = useState([]); // { id, emoji, userName }
+  const [showWhiteboard, setShowWhiteboard] = useState(false);
 
   // 1. Initialize WebRTC Hook
   const {
@@ -35,7 +38,6 @@ const ClassRoom = () => {
     isAudioEnabled,
     isVideoEnabled,
     isScreenSharing,
-    isCameraReady,
     initLocalMedia,
     toggleAudio,
     toggleVideo,
@@ -118,7 +120,7 @@ const ClassRoom = () => {
   else if (totalTiles <= 4) gridClass = 'grid-4';
 
   return (
-    <div className="classroom-page">
+    <div className={`classroom-page ${showWhiteboard ? 'whiteboard-active' : ''}`}>
       {/* 1. Header */}
       <header className="classroom-header">
         <div className="flex items-center gap-3">
@@ -141,51 +143,74 @@ const ClassRoom = () => {
             <Users2 size={14} className="text-primary" />
             <span className="text-sm font-semibold">{participants.length + 1}</span>
           </div>
+          <button 
+            className={`btn btn-sm ${showWhiteboard ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setShowWhiteboard(!showWhiteboard)}
+          >
+            <Presentation size={14} className="mr-2" />
+            {showWhiteboard ? 'Close Board' : 'Open Whiteboard'}
+          </button>
           <button className="btn btn-danger btn-sm" onClick={handleLeave}>
              Leave
           </button>
         </div>
       </header>
 
-      <div className="classroom-body">
-        {/* 2. Video Area */}
-        <main className="video-area">
-          <motion.div 
-            layout
-            className={`video-grid ${gridClass}`}
-          >
-            {/* Local Stream */}
-            <VideoPlayer
-              stream={localStream}
-              userName={user?.name}
-              userRole={user?.role}
-              isLocal={true}
-              isAudioEnabled={isAudioEnabled}
-              isVideoEnabled={isVideoEnabled}
-              isScreenSharing={isScreenSharing}
-            />
+        <div className="classroom-body">
+          {/* 2. Main Content Area */}
+          <main className="video-area">
+            <div className={`video-area-inner ${showWhiteboard ? 'with-whiteboard' : ''}`}>
+              <motion.div 
+                layout
+                className={`video-grid ${gridClass}`}
+              >
+                {/* Local Stream */}
+                <VideoPlayer
+                  stream={localStream}
+                  userName={user?.name}
+                  userRole={user?.role}
+                  isLocal={true}
+                  isAudioEnabled={isAudioEnabled}
+                  isVideoEnabled={isVideoEnabled}
+                  isScreenSharing={isScreenSharing}
+                />
 
-            {/* Remote Peers */}
-            <AnimatePresence>
-              {peerArray.map((peer) => (
-                <motion.div
-                  key={peer.socketId}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                >
-                  <VideoPlayer
-                    stream={peer.stream}
-                    userName={peer.userName}
-                    userRole={peer.userRole}
-                    isAudioEnabled={peer.isAudioEnabled !== false}
-                    isVideoEnabled={peer.isVideoEnabled !== false}
-                    isScreenSharing={peer.isScreenSharing}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+                {/* Remote Peers */}
+                <AnimatePresence>
+                  {peerArray.map((peer) => (
+                    <motion.div
+                      key={peer.socketId}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                    >
+                      <VideoPlayer
+                        stream={peer.stream}
+                        userName={peer.userName}
+                        userRole={peer.userRole}
+                        isAudioEnabled={peer.isAudioEnabled !== false}
+                        isVideoEnabled={peer.isVideoEnabled !== false}
+                        isScreenSharing={peer.isScreenSharing}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+
+              {/* Whiteboard Panel */}
+              <AnimatePresence>
+                {showWhiteboard && (
+                  <motion.div 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    className="whiteboard-panel-wrap"
+                  >
+                    <Whiteboard socket={socket} roomId={sessionId} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
           {/* 3. Controls Bar */}
           <div className="controls-bar">

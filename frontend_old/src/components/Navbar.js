@@ -45,7 +45,7 @@ const Navbar = () => {
         <div className="logo-icon">
           <GraduationCap size={20} strokeWidth={2.5} />
         </div>
-        <span style={{ letterSpacing: '-0.02em', fontWeight: 800 }}>LearnLive</span>
+        <span style={{ letterSpacing: '-0.02em', fontWeight: 800 }}>Acadly</span>
       </Link>
 
       {/* Nav Links */}

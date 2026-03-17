@@ -37,7 +37,7 @@ export const LoginPage = () => {
             <GraduationCap size={32} strokeWidth={2} />
           </div>
           <h1 className="auth-title">Welcome Back</h1>
-          <p className="auth-subtitle">Sign in to your LearnLive account</p>
+          <p className="auth-subtitle">Sign in to your Acadly account</p>
         </div>
 
         <form onSubmit={handleSubmit}>

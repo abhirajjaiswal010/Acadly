@@ -9,6 +9,7 @@ const morgan = require('morgan');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const classRoutes = require('./routes/classRoutes');
+const transcriptRoutes = require('./routes/transcriptRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
 const initializeSocket = require('./socket/socketHandler');
 
@@ -74,6 +75,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
+app.use('/api/transcripts', transcriptRoutes);
 
 // 404 Handler
 app.use((req, res) => {

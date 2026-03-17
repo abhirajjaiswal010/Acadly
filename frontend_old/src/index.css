@@ -1616,3 +1616,235 @@ img { max-width: 100%; }
   0%, 100% { transform: translateY(0); opacity: 0.5; }
   50% { transform: translateY(-4px); opacity: 1; }
 }
+/* ═══════════════════════════════════════════════════════
+   Transcript & AI Notes System
+══════════════════════════════════════════════════════════ */
+.bg-surface-dark { background-color: var(--bg-base); }
+.bg-surface-light { background-color: var(--bg-surface); }
+.text-text { color: var(--text-primary); }
+.text-text-muted { color: var(--text-muted); }
+.text-text-light { color: var(--text-secondary); }
+.border-border { border-color: var(--border); }
+
+/* Custom Scrollbar for Transcript/Notes */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Transcript Entry Styles */
+.transcript-entry {
+  position: relative;
+  transition: var(--transition);
+}
+
+.transcript-entry::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--primary);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.transcript-entry:hover::before {
+  opacity: 1;
+}
+
+/* Note Section Styles */
+.note-section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  transition: var(--transition);
+}
+
+.note-section-card:hover {
+  border-color: var(--primary-glow);
+  transform: translateX(4px);
+}
+
+/* AI Chat Bubble Animation */
+.ai-message-enter {
+  animation: slide-in-right 0.3s ease forwards;
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Live Captions Glow */
+.captions-glow {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive sidebar adjustments */
+.classroom-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  border-left: 1px solid var(--border);
+  background: var(--bg-surface);
+  transition: width 0.3s ease;
+}
+
+.sidebar-tabs {
+  display: flex;
+  background: var(--bg-base);
+  padding: 0.5rem;
+  gap: 0.25rem;
+}
+
+.sidebar-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.25rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-md);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: var(--transition);
+}
+
+.sidebar-tab.active {
+  background: var(--bg-surface);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar-tab:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.badge-count {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  min-width: 16px;
+  height: 16px;
+  background: var(--danger);
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+/* ────────────────────────────────────────────────────────
+   Live Transcript & AI System (Detailed)
+   ──────────────────────────────────────────────────────── */
+
+/* Utility Mappings (Bridge for Tailwind-like classes) */
+.absolute { position: absolute; }
+.relative { position: relative; }
+.bottom-20 { bottom: 5rem; }
+.left-0 { left: 0; }
+.right-0 { right: 0; }
+.z-50 { z-index: 50; }
+.pointer-events-none { pointer-events: none; }
+.max-w-2xl { max-width: 42rem; }
+.max-w-none { max-width: none; }
+.shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+.leading-relaxed { line-height: 1.625; }
+.whitespace-pre-wrap { white-space: pre-wrap; }
+.italic { font-style: italic; }
+.font-medium { font-weight: 500; }
+.tracking-widest { letter-spacing: 0.1em; }
+.uppercase { text-transform: uppercase; }
+
+/* Live Transcript Overlay */
+.bg-black\/60 { background-color: rgba(0, 0, 0, 0.6); }
+.backdrop-blur-md { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.border-white\/10 { border-color: rgba(255, 255, 255, 0.1); }
+.drop-shadow-sm { filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5)); }
+
+/* Highlighting */
+mark.bg-primary\/30 {
+  background-color: var(--primary-glow);
+  color: inherit;
+  font-weight: 600;
+}
+
+/* Chat Bubbles */
+.bg-primary\/20 { background-color: rgba(99, 102, 241, 0.2); }
+.border-primary\/20 { border-color: rgba(99, 102, 241, 0.2); }
+.bg-accent\/20 { background-color: rgba(34, 197, 94, 0.2); }
+.ring-accent\/10 { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1); }
+
+/* Sidebar Tabs Specifics */
+.sidebar-tab .badge-count {
+  background: var(--primary);
+  opacity: 0.8;
+}
+
+.sidebar-tab:hover .badge-count {
+  opacity: 1;
+}
+
+/* Scrollbar refinement */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--primary-light); }
+
+/* Animation classes */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+/* Notes prose styling */
+.prose-sm { font-size: 0.875rem; line-height: 1.7142857; }
+.prose-invert { color: var(--text-secondary); }
+.prose-invert strong { color: var(--text-primary); font-weight: 600; }
+.prose-invert h1, .prose-invert h2, .prose-invert h3 { 
+  color: var(--text-primary); 
+  font-weight: 700; 
+  margin-top: 1.5rem; 
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.025em;
+}
+
+/* Reaction Bubbles refinements */
+.reaction-bubble {
+  position: absolute;
+  pointer-events: none;
+  z-index: 100;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.reaction-bubble span:last-child {
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}

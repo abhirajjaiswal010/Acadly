@@ -10,9 +10,19 @@ import toast from 'react-hot-toast';
 import { 
   Mic, MicOff, Video as VideoIcon, VideoOff, ScreenShare, 
   Smile, Hand, PhoneOff, MessageSquare, Users, 
-  LogOut, GraduationCap, Users2, ShieldCheck, MonitorOff
+  LogOut, GraduationCap, Users2, ShieldCheck, MonitorOff,
+  FileText, Brain, Sparkles, Languages, Search as SearchIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Transcript System Components
+import useTranscript from '../hooks/useTranscript';
+import LiveCaptions from '../components/LiveCaptions';
+import TranscriptPanel from '../components/TranscriptPanel';
+import NotesPanel from '../components/NotesPanel';
+import AIChat from '../components/AIChat';
+import SearchBar from '../components/SearchBar';
+import { transcriptAPI } from '../utils/api';
 
 const ClassRoom = () => {
   const { sessionId } = useParams();
@@ -23,9 +33,17 @@ const ClassRoom = () => {
   const { currentClass, loading } = useSelector((state) => state.classes);
   
   const [socket, setSocket] = useState(null);
-  const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'participants'
+  const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'participants' | 'transcript' | 'notes' | 'ai-chat'
   const [showReactions, setShowReactions] = useState(false);
   const [reactions, setReactions] = useState([]); // { id, emoji, userName }
+  
+  // Transcript API states
+  const [aiNotes, setAiNotes] = useState(null);
+  const [isGeneratingNotes, setIsGeneratingNotes] = useState(false);
+  const [aiChatHistory, setAiChatHistory] = useState([]);
+  const [isAiAnswering, setIsAiAnswering] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState(null);
 
   // 1. Initialize WebRTC Hook
   const {
@@ -43,6 +61,16 @@ const ClassRoom = () => {
     stopScreenShare,
     cleanup
   } = useWebRTC(sessionId, user?.role);
+
+  // 1b. Initialize Transcript Hook
+  const {
+    isTranscribing,
+    liveCaptions,
+    transcriptChunks,
+    toggleTranscription,
+    language,
+    setLanguage
+  } = useTranscript(sessionId, user?.role, isAudioEnabled);
 
   // 2. Setup Socket & Data
   useEffect(() => {
@@ -117,6 +145,54 @@ const ClassRoom = () => {
   else if (totalTiles === 3) gridClass = 'grid-3';
   else if (totalTiles <= 4) gridClass = 'grid-4';
 
+  const handleGenerateNotes = async () => {
+    try {
+      setIsGeneratingNotes(true);
+      const res = await transcriptAPI.generateNotes(sessionId);
+      if (res.data.success) {
+        setAiNotes(res.data.notes);
+        toast.success('Smart Notes generated!');
+      }
+    } catch (err) {
+      toast.error('Failed to generate notes. Is there enough transcript?');
+    } finally {
+      setIsGeneratingNotes(false);
+    }
+  };
+
+  const handleAskAI = async (question) => {
+    try {
+      setIsAiAnswering(true);
+      const res = await transcriptAPI.askAI(sessionId, question);
+      if (res.data.success) {
+        setAiChatHistory(prev => [...prev, { question, answer: res.data.answer }]);
+      }
+    } catch (err) {
+      toast.error('AI assistant is busy or has no context.');
+    } finally {
+      setIsAiAnswering(false);
+    }
+  };
+
+  const handleExport = async (type) => {
+    try {
+      if (type === 'markdown') {
+        const res = await transcriptAPI.exportMarkdown(sessionId);
+        const url = window.URL.createObjectURL(new Blob([res.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${sessionId}-transcript.md`);
+        document.body.appendChild(link);
+        link.click();
+        toast.success('Transcript exported!');
+      } else {
+        toast('PDF export coming soon. Use Markdown for now!');
+      }
+    } catch (err) {
+      toast.error('Failed to export. Transcript might be empty.');
+    }
+  };
+
   return (
     <div className="classroom-page">
       {/* 1. Header */}
@@ -164,6 +240,9 @@ const ClassRoom = () => {
               isVideoEnabled={isVideoEnabled}
               isScreenSharing={isScreenSharing}
             />
+
+            {/* Live Captions Overlay */}
+            <LiveCaptions captions={liveCaptions} isVisible={true} />
 
             {/* Remote Peers */}
             <AnimatePresence>
@@ -253,6 +332,23 @@ const ClassRoom = () => {
               </AnimatePresence>
             </div>
 
+            {/* Anyone can start transcribing for demo purposes */}
+            <button 
+              className={`control-btn ${isTranscribing ? 'active' : ''}`}
+              onClick={toggleTranscription}
+              title={isTranscribing ? 'Stop Transcribing' : 'Start Transcribing'}
+            >
+              <span className="icon">
+                {isTranscribing ? <Languages size={20} className="text-primary animate-pulse" /> : <Languages size={20} />}
+              </span>
+              <span>{isTranscribing ? 'Captions ON' : 'Captions'}</span>
+            </button>
+
+            <button className="control-btn" onClick={() => setActiveTab('ai-chat')}>
+              <span className="icon"><Brain size={20} /></span>
+              <span>Ask AI</span>
+            </button>
+
             <button className="control-btn" onClick={() => toast.success('Raise Hand toggled (Demo)')}>
               <span className="icon"><Hand size={20} /></span>
               <span>Hand</span>
@@ -274,7 +370,20 @@ const ClassRoom = () => {
             >
               <MessageSquare size={16} />
               <span>Chat</span>
-              <span className="badge-count">!</span>
+            </button>
+            <button 
+              className={`sidebar-tab ${activeTab === 'transcript' ? 'active' : ''}`}
+              onClick={() => setActiveTab('transcript')}
+            >
+              <FileText size={16} />
+              <span>Transcript</span>
+            </button>
+            <button 
+              className={`sidebar-tab ${activeTab === 'notes' ? 'active' : ''}`}
+              onClick={() => setActiveTab('notes')}
+            >
+              <Sparkles size={16} />
+              <span>Notes</span>
             </button>
             <button 
               className={`sidebar-tab ${activeTab === 'participants' ? 'active' : ''}`}
@@ -282,7 +391,6 @@ const ClassRoom = () => {
             >
               <Users size={16} />
               <span>People</span>
-              <span className="badge-count" style={{ background: 'var(--text-muted)' }}>{participants.length + 1}</span>
             </button>
           </div>
 
@@ -292,10 +400,40 @@ const ClassRoom = () => {
             animate={{ opacity: 1, x: 0 }}
             className="flex-1 overflow-hidden flex flex-col"
           >
-            {activeTab === 'chat' ? (
+            {activeTab === 'chat' && (
               <ChatBox socket={socket} roomId={sessionId} />
-            ) : (
-              <div className="participants-panel">
+            )}
+
+            {activeTab === 'transcript' && (
+              <TranscriptPanel 
+                chunks={transcriptChunks} 
+                roomId={sessionId}
+                onExport={(type) => handleExport(type)}
+              />
+            )}
+
+            {activeTab === 'notes' && (
+              <NotesPanel 
+                notes={aiNotes} 
+                isLoading={isGeneratingNotes}
+                onGenerate={handleGenerateNotes}
+                onExport={(type) => handleExport(type)}
+              />
+            )}
+
+            {activeTab === 'ai-chat' && (
+              <AIChat 
+                history={aiChatHistory}
+                isLoading={isAiAnswering}
+                onAsk={handleAskAI}
+              />
+            )}
+
+            {activeTab === 'participants' && (
+              <div className="participants-panel overflow-y-auto">
+                <div className="p-4 border-b border-border bg-surface-light">
+                  <h3 className="font-semibold text-sm">Participants ({participants.length + 1})</h3>
+                </div>
                 {/* Local */}
                 <div className="participant-item">
                   <div className="participant-avatar">{user?.name?.charAt(0)}</div>

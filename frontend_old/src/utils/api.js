@@ -49,4 +49,19 @@ export const classAPI = {
   getAllClassesAdmin: () => API.get('/classes/admin/all'),
 };
 
+// ─── Transcripts ────────────────────────────────────────
+export const transcriptAPI = {
+  getChunks: (roomId) => API.get(`/transcripts/${roomId}/chunks`),
+  getFullTranscript: (roomId) => API.get(`/transcripts/${roomId}/full`),
+  buildTranscript: (roomId) => API.post(`/transcripts/${roomId}/build`),
+  generateNotes: (roomId) => API.post(`/transcripts/${roomId}/notes`),
+  getNotes: (roomId) => API.get(`/transcripts/${roomId}/notes`),
+  askAI: (roomId, question) => API.post(`/transcripts/${roomId}/ask`, { question }),
+  search: (roomId, query) => API.get(`/transcripts/${roomId}/search`, { params: { q: query } }),
+  translate: (roomId, targetLanguage, type) =>
+    API.post(`/transcripts/${roomId}/translate`, { targetLanguage, type }),
+  exportMarkdown: (roomId) => API.get(`/transcripts/${roomId}/export/markdown`, { responseType: 'blob' }),
+  exportPDFData: (roomId) => API.get(`/transcripts/${roomId}/export/pdf-data`),
+};
+
 export default API;

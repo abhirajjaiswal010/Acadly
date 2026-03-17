@@ -14,6 +14,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Class = require('../models/Class');
+const initTranscriptSocket = require('./transcriptSocketHandler');
 
 // Map: roomId -> Set of connected socket IDs
 const rooms = new Map();
@@ -58,6 +59,9 @@ const initializeSocket = (io) => {
   // ────────────────────────────────────────────────────────────────
   io.on('connection', (socket) => {
     console.log(`🔌 Socket connected: ${socket.id} (${socket.userName} - ${socket.userRole})`);
+
+    // Initialize transcript/caption socket events
+    initTranscriptSocket(socket, io);
 
     // ─────────────────────────────────────────
     // JOIN ROOM

@@ -2,15 +2,14 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authAPI } from '../../utils/api';
 import toast from 'react-hot-toast';
 
-// ──── Async Thunks ────────────────────────────────────────────────
-
+// ──── Async Thunks ────────────────────────────────────────────
 export const registerUser = createAsyncThunk(
   'auth/register',
   async (userData, { rejectWithValue }) => {
     try {
       const { data } = await authAPI.register(userData);
-      localStorage.setItem('learnlive_token', data.token);
-      localStorage.setItem('learnlive_user', JSON.stringify(data.user));
+      localStorage.setItem('acadly_token', data.token);
+      localStorage.setItem('acadly_user', JSON.stringify(data.user));
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Registration failed');
@@ -23,8 +22,8 @@ export const loginUser = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const { data } = await authAPI.login(credentials);
-      localStorage.setItem('learnlive_token', data.token);
-      localStorage.setItem('learnlive_user', JSON.stringify(data.user));
+      localStorage.setItem('acadly_token', data.token);
+      localStorage.setItem('acadly_user', JSON.stringify(data.user));
       return data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || 'Login failed');
@@ -57,8 +56,8 @@ export const updateUserProfile = createAsyncThunk(
 );
 
 // ──── Initial State ────────────────────────────────────────────────
-const storedUser = localStorage.getItem('learnlive_user');
-const storedToken = localStorage.getItem('learnlive_token');
+const storedUser = localStorage.getItem('acadly_user');
+const storedToken = localStorage.getItem('acadly_token');
 
 const initialState = {
   user: storedUser ? JSON.parse(storedUser) : null,
@@ -77,8 +76,8 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
-      localStorage.removeItem('learnlive_token');
-      localStorage.removeItem('learnlive_user');
+      localStorage.removeItem('acadly_token');
+      localStorage.removeItem('acadly_user');
       toast.success('Logged out successfully');
     },
     clearError: (state) => {
@@ -86,7 +85,7 @@ const authSlice = createSlice({
     },
     updateUserLocal: (state, action) => {
       state.user = { ...state.user, ...action.payload };
-      localStorage.setItem('learnlive_user', JSON.stringify(state.user));
+      localStorage.setItem('acadly_user', JSON.stringify(state.user));
     },
   },
   extraReducers: (builder) => {
@@ -128,20 +127,20 @@ const authSlice = createSlice({
     builder.addCase(fetchCurrentUser.fulfilled, (state, action) => {
       state.user = action.payload;
       state.isAuthenticated = true;
-      localStorage.setItem('learnlive_user', JSON.stringify(action.payload));
+      localStorage.setItem('acadly_user', JSON.stringify(action.payload));
     });
     builder.addCase(fetchCurrentUser.rejected, (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
-      localStorage.removeItem('learnlive_token');
-      localStorage.removeItem('learnlive_user');
+      localStorage.removeItem('acadly_token');
+      localStorage.removeItem('acadly_user');
     });
 
     // Update Profile
     builder.addCase(updateUserProfile.fulfilled, (state, action) => {
       state.user = action.payload;
-      localStorage.setItem('learnlive_user', JSON.stringify(action.payload));
+      localStorage.setItem('acadly_user', JSON.stringify(action.payload));
       toast.success('Profile updated!');
     });
   },

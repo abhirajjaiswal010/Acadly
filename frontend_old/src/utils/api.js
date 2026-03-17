@@ -7,7 +7,7 @@ const API = axios.create({
 
 // Attach token to every request automatically
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('learnlive_token');
+  const token = localStorage.getItem('acadly_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -19,8 +19,8 @@ API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('learnlive_token');
-      localStorage.removeItem('learnlive_user');
+      localStorage.removeItem('acadly_token');
+      localStorage.removeItem('acadly_user');
       window.location.href = '/login';
     }
     return Promise.reject(error);
